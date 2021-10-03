@@ -92,62 +92,62 @@ public class TestSample{
 		}
 
 
-		// Delay 5 seconds
-		try {
-			TimeUnit.SECONDS.sleep(2);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		// // Delay 5 seconds
+		// try {
+		// 	TimeUnit.SECONDS.sleep(2);
+		// } catch (InterruptedException e) {
+		// 	e.printStackTrace();
+		// }
 
 
 
-		/* Test with a file */
+		// /* Test with a file */
 
-		fileKey = "chapter1.txt";
-		inputPath = "./inputfiles/lofi.mp3";
-		outputPath = "./outputfiles/lofi_.mp3";
+		// fileKey = "chapter1.txt";
+		// inputPath = "./inputfiles/lofi.mp3";
+		// outputPath = "./outputfiles/lofi_.mp3";
 
-		// PUT File
-		try {
-			System.out.println("Putting file \"" + inputPath + "\" with key \"" + fileKey + "\"");
-			ret = client.put(fileKey, inputPath);
-			if(ret == 0) {
-				System.out.println("Successfully put file!");
-			}else {
-				System.out.println("Failed to put file \"" + inputPath + "\" with key \"" + fileKey + "\". Key already exists. (INCORRECT RETURN)");
-			}
-		} catch (Exception e1) {
-			e1.printStackTrace();
-			System.out.println("Failed to put file \"" + inputPath + "\" with key \"" + fileKey + "\". Exception occured.");
-		} 
+		// // PUT File
+		// try {
+		// 	System.out.println("Putting file \"" + inputPath + "\" with key \"" + fileKey + "\"");
+		// 	ret = client.put(fileKey, inputPath);
+		// 	if(ret == 0) {
+		// 		System.out.println("Successfully put file!");
+		// 	}else {
+		// 		System.out.println("Failed to put file \"" + inputPath + "\" with key \"" + fileKey + "\". Key already exists. (INCORRECT RETURN)");
+		// 	}
+		// } catch (Exception e1) {
+		// 	e1.printStackTrace();
+		// 	System.out.println("Failed to put file \"" + inputPath + "\" with key \"" + fileKey + "\". Exception occured.");
+		// } 
 
-		// GET File
-		try {
-			System.out.println("Getting object with key \"" + fileKey + "\"");
-			ret = client.get(fileKey, outputPath);
-			if(ret == 0) {
-				fileIn = new File(inputPath);
-				fileOut = new File(outputPath);
-				if(fileOut.exists()) {
-					fileInBytes = Files.readAllBytes(fileIn.toPath());
-					fileOutBytes = Files.readAllBytes(fileOut.toPath());
-					if(Arrays.equals(fileInBytes, fileOutBytes)) {
-						System.out.println("File contents are equal! Successfully Retrieved File");
-					}else {
-						System.out.println("File contents are not equal! Got garbage data. (BAD FILE DOWNLOAD)");
-					}
-					System.out.println("Deleting downloaded file.");
-					Files.delete(fileOut.toPath());
-				}else {
-					System.out.println("No file downloaded. (BAD FILE DOWNLOAD)");
-				}
-			}else {
-				System.out.println("Failed getting object with key \"" + stringKey + "\". Key doesn't exist. (INCORRECT RETURN)");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			System.out.println("Failed getting object with key \"" + stringKey + "\" Exception occured.");
-		}
+		// // GET File
+		// try {
+		// 	System.out.println("Getting object with key \"" + fileKey + "\"");
+		// 	ret = client.get(fileKey, outputPath);
+		// 	if(ret == 0) {
+		// 		fileIn = new File(inputPath);
+		// 		fileOut = new File(outputPath);
+		// 		if(fileOut.exists()) {
+		// 			fileInBytes = Files.readAllBytes(fileIn.toPath());
+		// 			fileOutBytes = Files.readAllBytes(fileOut.toPath());
+		// 			if(Arrays.equals(fileInBytes, fileOutBytes)) {
+		// 				System.out.println("File contents are equal! Successfully Retrieved File");
+		// 			}else {
+		// 				System.out.println("File contents are not equal! Got garbage data. (BAD FILE DOWNLOAD)");
+		// 			}
+		// 			System.out.println("Deleting downloaded file.");
+		// 			Files.delete(fileOut.toPath());
+		// 		}else {
+		// 			System.out.println("No file downloaded. (BAD FILE DOWNLOAD)");
+		// 		}
+		// 	}else {
+		// 		System.out.println("Failed getting object with key \"" + stringKey + "\". Key doesn't exist. (INCORRECT RETURN)");
+		// 	}
+		// } catch (IOException e1) {
+		// 	e1.printStackTrace();
+		// 	System.out.println("Failed getting object with key \"" + stringKey + "\" Exception occured.");
+		// }
 
 		// Disconnect
 		System.out.println("Attempting to disconnect...");

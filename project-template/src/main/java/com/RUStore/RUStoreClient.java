@@ -1,10 +1,17 @@
 package com.RUStore;
 
 /* any necessary Java packages here */
+import java.net.*;
+import java.io.*;
 
 public class RUStoreClient {
 
-	/* any necessary class members here */
+	// Class variables to setup client
+	private int port;
+	private String host;
+	private Socket clientSocket;
+	private DataOutputStream out;
+	private DataInputStream in;
 
 	/**
 	 * RUStoreClient Constructor, initializes default values
@@ -15,20 +22,22 @@ public class RUStoreClient {
 	 */
 	public RUStoreClient(String host, int port) {
 
-		// Implement here
-
+		// Set the object variables
+		this.port = port;
+		this.host = host;
 	}
 
 	/**
 	 * Opens a socket and establish a connection to the object store server
 	 * running on a given host and port.
 	 *
-	 * @return		n/a, however throw an exception if any issues occur
+	 * @return n/a, however throw an exception if any issues occur
 	 */
-	public void connect() {
+	public void connect() throws UnknownHostException, IOException{
 
-		// Implement here
-
+		this.clientSocket = new Socket(host, port);
+		this.out = new DataOutputStream(this.clientSocket.getOutputStream());
+		this.in = new DataInputStream(this.clientSocket.getInputStream());
 	}
 
 	/**
@@ -43,11 +52,41 @@ public class RUStoreClient {
 	 *        		1 if key already exists
 	 *        		Throw an exception otherwise
 	 */
-	public int put(String key, byte[] data) {
+	public int put(String key, byte[] data) throws IOException {
 
-		// Implement here
-		return -1;
+		String response;
 
+		try{
+
+			// Let server know you want to store a key/value
+			this.out.writeUTF("PUT");
+			this.out.writeUTF(key);
+			this.out.flush();
+
+			//check if the key already exists on the server and react accordingly
+			response = this.in.readUTF();
+
+			if ("Invalid Key".equals(response)){
+				return 1;
+			} else if ("Ready".equals(response)){
+
+				this.out.writeInt(data.length);
+				this.out.write(data);
+				this.out.flush();
+				response = this.in.readUTF();
+
+				if("ERROR UNABLE TO STORE".equals(response)){
+					throw new IOException("Unable to write to server");
+				} else {
+					return 0;
+				}
+			} else {
+				throw new IOException("Invalid server response");
+			}
+
+		} catch(Exception e){
+			throw new IOException("Unable to write to socket");
+		}
 	}
 
 	/**
@@ -78,11 +117,34 @@ public class RUStoreClient {
 	 * @return		object data as a byte array, null if key doesn't exist.
 	 *        		Throw an exception if any other issues occur.
 	 */
-	public byte[] get(String key) {
+	public byte[] get(String key) throws IOException{
 
-		// Implement here
-		return null;
+		// Tell the server that you want to retrieve something
+		this.out.writeUTF("GET");
 
+		// Give the server the key you'd like to retrieve
+		this.out.writeUTF(key);
+		this.out.flush();
+		String response = this.in.readUTF();
+
+		// Check if the key was good
+		if ("Invalid Key".equals(response)){
+			// key does not exist on the server
+			return null;
+		} else if ("Success".equals(response)){
+
+			try{
+				int messLength = this.in.readInt();
+				byte[] message = new byte[messLength];
+				this.in.readFully(message, 0, messLength);
+				return message;
+			} catch (Exception e){
+				e.printStackTrace();
+				throw new IOException("Invalid Server Response");
+			}
+		} else {
+			throw new IOException("Invalid Server Response");
+		}
 	}
 
 	/**
@@ -140,10 +202,11 @@ public class RUStoreClient {
 	 * 
 	 * @return		n/a, however throw an exception if any issues occur
 	 */
-	public void disconnect() {
+	public void disconnect() throws IOException{
 
-		// Implement here
-
+		// Close the client socket
+		this.clientSocket.close();
+		this.out.close();
 	}
 
 }
