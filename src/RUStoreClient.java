@@ -193,11 +193,51 @@ public class RUStoreClient {
 	 *        		1 if key doesn't exist
 	 *        		Throw an exception otherwise
 	 */
-	public int get(String key, String file_path) {
+	public int get(String key, String file_path) throws IOException{
 
-		// Implement here
-		return -1;
+		byte[] file_bytes;
+		String response;
+		int fileLength;
+		FileOutputStream fout;
 
+		try{
+			// Tell the server that you want to retrieve a file
+			this.out.writeUTF("GET_FILE");
+
+			// Give the server the key you'd like to retrieve
+			this.out.writeUTF(key);
+			this.out.flush();
+			response = this.in.readUTF();
+
+			// Check if the key was good
+			if ("Invalid Key".equals(response)){
+				// key does not exist on the server
+				return 1;
+			} else if ("Success".equals(response)){
+
+				try{
+
+					fileLength = this.in.readInt();
+					file_bytes = new byte[fileLength];
+					this.in.readFully(file_bytes, 0, fileLength);
+				} catch (Exception e){
+
+					e.printStackTrace();
+					throw new IOException("Invalid Server Response");
+				}
+
+				// write file to output files
+				fout = new FileOutputStream(file_path);
+				fout.write(file_bytes);
+				fout.close();
+				return 0;
+			} else {
+				throw new IOException("Invalid Server Response");
+			}
+		} catch (Exception e){
+			e.printStackTrace();
+			throw new IOException("Unable to connect to server");
+		}
 	}
 
 	/**

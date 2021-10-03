@@ -121,33 +121,33 @@ public class TestSample{
 			System.out.println("Failed to put file \"" + inputPath + "\" with key \"" + fileKey + "\". Exception occured.");
 		} 
 
-		// // GET File
-		// try {
-		// 	System.out.println("Getting object with key \"" + fileKey + "\"");
-		// 	ret = client.get(fileKey, outputPath);
-		// 	if(ret == 0) {
-		// 		fileIn = new File(inputPath);
-		// 		fileOut = new File(outputPath);
-		// 		if(fileOut.exists()) {
-		// 			fileInBytes = Files.readAllBytes(fileIn.toPath());
-		// 			fileOutBytes = Files.readAllBytes(fileOut.toPath());
-		// 			if(Arrays.equals(fileInBytes, fileOutBytes)) {
-		// 				System.out.println("File contents are equal! Successfully Retrieved File");
-		// 			}else {
-		// 				System.out.println("File contents are not equal! Got garbage data. (BAD FILE DOWNLOAD)");
-		// 			}
-		// 			System.out.println("Deleting downloaded file.");
-		// 			Files.delete(fileOut.toPath());
-		// 		}else {
-		// 			System.out.println("No file downloaded. (BAD FILE DOWNLOAD)");
-		// 		}
-		// 	}else {
-		// 		System.out.println("Failed getting object with key \"" + stringKey + "\". Key doesn't exist. (INCORRECT RETURN)");
-		// 	}
-		// } catch (IOException e1) {
-		// 	e1.printStackTrace();
-		// 	System.out.println("Failed getting object with key \"" + stringKey + "\" Exception occured.");
-		// }
+		// GET File
+		try {
+			System.out.println("Getting object with key \"" + fileKey + "\"");
+			ret = client.get(fileKey, outputPath);
+			if(ret == 0) {
+				fileIn = new File(inputPath);
+				fileOut = new File(outputPath);
+				if(fileOut.exists()) {
+					fileInBytes = Files.readAllBytes(fileIn.toPath());
+					fileOutBytes = Files.readAllBytes(fileOut.toPath());
+					if(Arrays.equals(fileInBytes, fileOutBytes)) {
+						System.out.println("File contents are equal! Successfully Retrieved File");
+					}else {
+						System.out.println("File contents are not equal! Got garbage data. (BAD FILE DOWNLOAD)");
+					}
+					System.out.println("Deleting downloaded file.");
+					Files.delete(fileOut.toPath());
+				}else {
+					System.out.println("No file downloaded. (BAD FILE DOWNLOAD)");
+				}
+			}else {
+				System.out.println("Failed getting object with key \"" + stringKey + "\". Key doesn't exist. (INCORRECT RETURN)");
+			}
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			System.out.println("Failed getting object with key \"" + stringKey + "\" Exception occured.");
+		}
 
 		// Disconnect
 		System.out.println("Attempting to disconnect...");

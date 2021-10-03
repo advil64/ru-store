@@ -36,6 +36,11 @@ public class RUStoreServer {
     String fileName;
     int fileLength;
     byte[] fileBytes;
+		FileOutputStream fout;
+		File directory;
+
+		//vars for get file
+		Path filePath;
 
 		socket = new ServerSocket(port);
 
@@ -142,15 +147,54 @@ public class RUStoreServer {
 								continue;
 							}
 
-              //write bytes to file
-			        File newFile = new File("./serverfiles/" + key);
-              Files.write(newFile.toPath(), fileBytes);
+              //write bytes to file (first create directory is not there)
+							directory = new File("./serverfiles"); 
+							
+							if (directory.exists()) { 
+								System.out.println("Directory already exists..."); 
+							} else { 
+								System.out.println("Directory does not exist, creating now");
+								if (directory.mkdir()) { 
+									System.out.printf("Created new directory : serverfiles"); 
+								} else { 
+									System.out.printf("Could not create new directory: serverfiles"); 
+									break;
+								} 
+							}
+
+							//next create and write to file
+							fout = new FileOutputStream("./serverfiles/" + key);
+							fout.write(fileBytes);
+							fout.close();
 							out.writeUTF("Success");
 							out.flush();
 						}
             break;
           case "EXIT":
             connected = false;
+						break;
+					case "GET_FILE":
+						// read the key
+					  key = in.readUTF();
+
+            // check and retrieve the value associated with the key
+            if (!fileStore.containsKey(key)){
+              out.writeUTF("Invalid Key");
+              out.flush();
+            } else {
+              try{
+
+                out.writeUTF("Success");
+								filePath = Paths.get("./serverfiles/"+key);
+								fileBytes = Files.readAllBytes(filePath);
+                out.writeInt(fileBytes.length);
+                out.write(fileBytes);
+                out.flush();
+              } catch (Exception e){
+                e.printStackTrace();
+              }
+            }
+						break;
 					default:
 						break;
 				}
