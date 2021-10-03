@@ -3,6 +3,7 @@ package com.RUStore;
 /* any necessary Java packages here */
 import java.net.*;
 import java.io.*;
+import java.nio.file.*;
 
 public class RUStoreClient {
 
@@ -101,11 +102,45 @@ public class RUStoreClient {
 	 *        		1 if key already exists
 	 *        		Throw an exception otherwise
 	 */
-	public int put(String key, String file_path) {
+	public int put(String key, String file_path) throws IOException{
 
-		// Implement here
-		return -1;
+		String response;
+		Path path = Paths.get(file_path);
+		byte[] data = Files.readAllBytes(path);
 
+		try{
+
+			// Let server know you want to store a key/value
+			this.out.writeUTF("PUT_FILE");
+			this.out.writeUTF(key);
+			this.out.flush();
+
+			//check if the key already exists on the server and react accordingly
+			response = this.in.readUTF();
+
+			if ("Invalid Key".equals(response)){
+				return 1;
+			} else if ("Ready".equals(response)){
+
+				//send the file over
+				this.out.writeUTF(file_path);
+				this.out.writeInt(data.length);
+				this.out.write(data);
+				this.out.flush();
+				response = this.in.readUTF();
+
+				if("ERROR UNABLE TO STORE".equals(response)){
+					throw new IOException("Unable to write to server");
+				} else {
+					return 0;
+				}
+			} else {
+				throw new IOException("Invalid server response");
+			}
+
+		} catch(Exception e){
+			throw new IOException("Unable to write to socket");
+		}
 	}
 
 	/**
@@ -205,6 +240,7 @@ public class RUStoreClient {
 	public void disconnect() throws IOException{
 
 		// Close the client socket
+		this.out.writeUTF("EXIT");
 		this.clientSocket.close();
 		this.out.close();
 	}

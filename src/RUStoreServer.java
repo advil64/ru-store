@@ -3,20 +3,21 @@ package com.RUStore;
 /* any necessary Java packages here */
 import java.net.*;
 import java.io.*;
+import java.nio.file.*;
 import java.lang.Thread;
-import java.util.Arrays;
 import java.util.HashMap;
 
 public class RUStoreServer {
 
 	// Class variables to setup server
 	private ServerSocket socket;
-  private Socket clientSocket;
+	private Socket clientSocket;
 	private DataInputStream in;
 	private DataOutputStream out;
 
 	// Class variables to store data
 	HashMap<String, byte[]> memStore = new HashMap<>();
+	HashMap<String, String> fileStore = new HashMap<>();
 
 	/**
 	 * starts the RU Store server
@@ -24,10 +25,17 @@ public class RUStoreServer {
 	 */
 	public void start(int port) throws IOException, InterruptedException{
 
+    // vars for put memstore
 		int messageLength;
 		String message;
 		byte[] value;
 		String key;
+    boolean connected;
+
+    //vars for put file
+    String fileName;
+    int fileLength;
+    byte[] fileBytes;
 
 		socket = new ServerSocket(port);
 
@@ -38,11 +46,12 @@ public class RUStoreServer {
 			// Read and output any messages given on the socket
 			in = new DataInputStream(clientSocket.getInputStream());
 			out = new DataOutputStream(clientSocket.getOutputStream());
+			connected = true;
 
 			// loop to recieve continuous messages
-			while (true) {
+			while (connected) {
 
-        message = in.readUTF();
+				message = in.readUTF();
 
 				switch (message) {
 					case "PUT":
@@ -99,12 +108,54 @@ public class RUStoreServer {
                 e.printStackTrace();
               }
             }
+            break;
+          case "PUT_FILE":
 
+            //first get the key
+						key = in.readUTF();
+
+						// check if key exists and respond accordingly
+						if (fileStore.containsKey(key)){
+
+							out.writeUTF("Invalid Key");
+							out.flush();
+							continue;
+						} else {
+
+							// we're ready to accept the byte string
+							out.writeUTF("Ready");
+							out.flush();
+							try{
+
+								fileName = in.readUTF();
+                fileLength = in.readInt();
+								fileBytes = new byte[fileLength];
+								in.readFully(fileBytes, 0, fileLength);
+
+								fileStore.put(key, fileName);
+								System.out.println(fileStore);
+							} catch(Exception e){
+
+								out.writeUTF("ERROR UNABLE TO STORE");
+								out.flush();
+								e.printStackTrace();
+								continue;
+							}
+
+              //write bytes to file
+			        File newFile = new File("./serverfiles/" + key);
+              Files.write(newFile.toPath(), fileBytes);
+							out.writeUTF("Success");
+							out.flush();
+						}
+            break;
+          case "EXIT":
+            connected = false;
 					default:
 						break;
 				}
 
-        while(in.available() == 0){
+        while(in.available() == 0 && connected){
           Thread.sleep(1000);
         }
 

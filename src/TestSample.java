@@ -92,34 +92,34 @@ public class TestSample{
 		}
 
 
-		// // Delay 5 seconds
-		// try {
-		// 	TimeUnit.SECONDS.sleep(2);
-		// } catch (InterruptedException e) {
-		// 	e.printStackTrace();
-		// }
+		// Delay 5 seconds
+		try {
+			TimeUnit.SECONDS.sleep(2);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 
 
 
-		// /* Test with a file */
+		/* Test with a file */
 
-		// fileKey = "chapter1.txt";
-		// inputPath = "./inputfiles/lofi.mp3";
-		// outputPath = "./outputfiles/lofi_.mp3";
+		fileKey = "chapter1.txt";
+		inputPath = "./inputfiles/lofi.mp3";
+		outputPath = "./outputfiles/lofi_.mp3";
 
-		// // PUT File
-		// try {
-		// 	System.out.println("Putting file \"" + inputPath + "\" with key \"" + fileKey + "\"");
-		// 	ret = client.put(fileKey, inputPath);
-		// 	if(ret == 0) {
-		// 		System.out.println("Successfully put file!");
-		// 	}else {
-		// 		System.out.println("Failed to put file \"" + inputPath + "\" with key \"" + fileKey + "\". Key already exists. (INCORRECT RETURN)");
-		// 	}
-		// } catch (Exception e1) {
-		// 	e1.printStackTrace();
-		// 	System.out.println("Failed to put file \"" + inputPath + "\" with key \"" + fileKey + "\". Exception occured.");
-		// } 
+		// PUT File
+		try {
+			System.out.println("Putting file \"" + inputPath + "\" with key \"" + fileKey + "\"");
+			ret = client.put(fileKey, inputPath);
+			if(ret == 0) {
+				System.out.println("Successfully put file!");
+			}else {
+				System.out.println("Failed to put file \"" + inputPath + "\" with key \"" + fileKey + "\". Key already exists. (INCORRECT RETURN)");
+			}
+		} catch (Exception e1) {
+			e1.printStackTrace();
+			System.out.println("Failed to put file \"" + inputPath + "\" with key \"" + fileKey + "\". Exception occured.");
+		} 
 
 		// // GET File
 		// try {
