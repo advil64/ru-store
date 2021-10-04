@@ -4,6 +4,7 @@ package com.RUStore;
 import java.net.*;
 import java.io.*;
 import java.nio.file.*;
+import java.util.ArrayList;
 
 public class RUStoreClient {
 
@@ -71,6 +72,7 @@ public class RUStoreClient {
 				return 1;
 			} else if ("Ready".equals(response)){
 
+				//write size of the data then write the data
 				this.out.writeInt(data.length);
 				this.out.write(data);
 				this.out.flush();
@@ -154,26 +156,33 @@ public class RUStoreClient {
 	 */
 	public byte[] get(String key) throws IOException{
 
+		//method vars
+		String response;
+		int messLength;
+		byte[] message;
+
 		// Tell the server that you want to retrieve something
 		this.out.writeUTF("GET");
 
 		// Give the server the key you'd like to retrieve
 		this.out.writeUTF(key);
 		this.out.flush();
-		String response = this.in.readUTF();
+		response = this.in.readUTF();
 
 		// Check if the key was good
 		if ("Invalid Key".equals(response)){
 			// key does not exist on the server
 			return null;
 		} else if ("Success".equals(response)){
-
 			try{
-				int messLength = this.in.readInt();
-				byte[] message = new byte[messLength];
+
+				//read in the length of the message then read the message
+				messLength = this.in.readInt();
+				message = new byte[messLength];
 				this.in.readFully(message, 0, messLength);
 				return message;
 			} catch (Exception e){
+
 				e.printStackTrace();
 				throw new IOException("Invalid Server Response");
 			}
@@ -195,6 +204,7 @@ public class RUStoreClient {
 	 */
 	public int get(String key, String file_path) throws IOException{
 
+		// method vars
 		byte[] file_bytes;
 		String response;
 		int fileLength;
@@ -251,11 +261,22 @@ public class RUStoreClient {
 	 *        		1 if key doesn't exist
 	 *        		Throw an exception otherwise
 	 */
-	public int remove(String key) {
+	public int remove(String key) throws IOException{
 
-		// Implement here
-		return -1;
+		this.out.writeUTF("REMOVE");
 
+		//write the key to be removed
+		this.out.writeUTF(key);
+
+		//wait for response
+		String response = this.in.readUTF();
+
+		if("Success".equals(response)){
+			return 0;
+		} else if("Invalid Key".equals(response)){
+			return 1;
+		}
+		throw new IOException("Server Error");
 	}
 
 	/**
@@ -264,11 +285,17 @@ public class RUStoreClient {
 	 * @return		List of keys as string array, null if there are no keys.
 	 *        		Throw an exception if any other issues occur.
 	 */
-	public String[] list() {
+	public String[] list() throws IOException{
 
-		// Implement here
-		return null;
+		this.out.writeUTF("LIST");
+		ArrayList<String> keys = new ArrayList<String>();
+		int numKeys = this.in.readInt();
 
+		for(int i = 0; i < numKeys; i++){
+			keys.add(this.in.readUTF());
+		}
+
+		return keys.toArray(new String[0]);
 	}
 
 	/**

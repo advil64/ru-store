@@ -17,7 +17,6 @@ public class RUStoreServer {
 
 	// Class variables to store data
 	HashMap<String, byte[]> memStore = new HashMap<>();
-	HashMap<String, String> fileStore = new HashMap<>();
 
 	/**
 	 * starts the RU Store server
@@ -120,7 +119,7 @@ public class RUStoreServer {
 						key = in.readUTF();
 
 						// check if key exists and respond accordingly
-						if (fileStore.containsKey(key)){
+						if (memStore.containsKey(key)){
 
 							out.writeUTF("Invalid Key");
 							out.flush();
@@ -137,8 +136,8 @@ public class RUStoreServer {
 								fileBytes = new byte[fileLength];
 								in.readFully(fileBytes, 0, fileLength);
 
-								fileStore.put(key, fileName);
-								System.out.println(fileStore);
+								memStore.put(key, fileName.getBytes());
+								System.out.println(memStore);
 							} catch(Exception e){
 
 								out.writeUTF("ERROR UNABLE TO STORE");
@@ -170,15 +169,12 @@ public class RUStoreServer {
 							out.flush();
 						}
             break;
-          case "EXIT":
-            connected = false;
-						break;
 					case "GET_FILE":
 						// read the key
 					  key = in.readUTF();
 
             // check and retrieve the value associated with the key
-            if (!fileStore.containsKey(key)){
+            if (!memStore.containsKey(key)){
               out.writeUTF("Invalid Key");
               out.flush();
             } else {
@@ -194,6 +190,34 @@ public class RUStoreServer {
                 e.printStackTrace();
               }
             }
+						break;
+					case "REMOVE":
+						//read the key
+						key = in.readUTF();
+
+						if (memStore.containsKey(key)){
+							memStore.remove(key);
+							out.writeUTF("Success");
+						} else{
+							out.writeUTF("Invalid Key");
+						}
+
+						out.flush();
+						break;
+					case "LIST":
+
+						//send the number of keys
+						out.writeInt(memStore.keySet().size());
+						out.flush();
+
+						//write keys
+						for (String k : memStore.keySet()){
+							out.writeUTF(k);
+							out.flush();
+						}
+						break;
+					case "EXIT":
+            connected = false;
 						break;
 					default:
 						break;

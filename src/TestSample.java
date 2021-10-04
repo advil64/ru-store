@@ -103,9 +103,9 @@ public class TestSample{
 
 		/* Test with a file */
 
-		fileKey = "chapter1.txt";
-		inputPath = "./inputfiles/lofi.mp3";
-		outputPath = "./outputfiles/lofi_.mp3";
+		fileKey = "yolo.avi";
+		inputPath = "./inputfiles/solutions.pdf";
+		outputPath = "./outputfiles/solutions.pdf";
 
 		// PUT File
 		try {
@@ -148,6 +148,30 @@ public class TestSample{
 			e1.printStackTrace();
 			System.out.println("Failed getting object with key \"" + stringKey + "\" Exception occured.");
 		}
+
+		//delete key
+		System.out.println("Attempting to list keys... ");
+		try {
+			String[] keys = client.list();
+			for (String k : keys){
+				System.out.println(k);
+			}
+			System.out.println("Sucessfully listed.");
+		} catch (Exception e){
+			e.printStackTrace();
+			System.out.println("Failed to disconnect.");
+		}
+
+		//delete key
+		System.out.println("Attempting to delete key... " + fileKey);
+		try {
+			client.remove(fileKey);
+			System.out.println("Sucessfully removed.");
+		} catch (Exception e){
+			e.printStackTrace();
+			System.out.println("Failed to disconnect.");
+		}
+		
 
 		// Disconnect
 		System.out.println("Attempting to disconnect...");
