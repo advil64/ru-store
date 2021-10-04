@@ -1,18 +1,74 @@
-## Getting Started
+## RU-Store Instruction Manual
+### By Advith Chegu (Rutgers Distributed Systems Fall 2021)
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+Welcome to this little project! In this guide I'll take you through how my app works from both the server and client sides. It includes code snippets so you can follow along easily!
 
-## Folder Structure
+### Server Side Structure
 
-The workspace contains two folders by default, where:
+Let's first go over the server side store operations!
 
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
+**Put Operation**
 
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
+After a connection has been established and we have recieved a `PUT` command the app accepts the key from the client and checks to make sure it's not a duplicate.
 
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
+```java
+key = in.readUTF();
+if (memStore.containsKey(key)){
+  //inform client of an invalid key
+} else {
+  //continue with put store process
+}
+```
 
-## Dependency Management
+Once the necessary check is complete we proceed to storing the *key/value* pair in the memory store hashmap. The app does this by indicating to the client that the server is ready to recieve the data.
 
-The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
+```java
+out.writeUTF("Ready");
+
+messageLength = in.readInt();
+value = new byte[messageLength];
+in.readFully(value, 0, messageLength);
+
+memStore.put(key, value);
+```
+
+Then the app proceeds to first recieving the length of the message and then the message itself as an array of byted.
+
+**Get Operation**
+
+After a connection has been established and we have recieved a `GET` command the app accepts the key from the client and checks to make sure it exists in the memstore.
+
+```java
+key = in.readUTF();
+if (!memStore.containsKey(key)){
+  //inform client of an invalid key
+} else {
+  //continue with get value process
+}
+```
+
+Once the checks are complete, we simply do the opposite of what we did in the `PUT` command. We tell the client to get ready for the data, give the client the size of the value and then hand over the bytes!
+
+**Put File Operation**
+
+The `PUT_FILE` command is pretty much the same as the `PUT` command, however we now have the added step of writing the file to the server side. We first start off with creating the folder (if needed) then writing the file in the server files folder.
+
+```java
+directory = new File("./serverfiles"); 
+							
+if (directory.exists()) { 
+  //don't do anything
+} else { 
+  //create the server files directory
+}
+
+//next create and write to file
+fout = new FileOutputStream(filepath);
+fout.write(fileBytes);
+out.writeUTF("Success");
+```
+
+Once the file has been stored we let the client know our action suceeded.
+
+**Get File Operation**
+
