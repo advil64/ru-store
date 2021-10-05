@@ -1,0 +1,7 @@
+{
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "editor.autoIndent": "advanced",
+    "java.project.sourcePaths": ["src"],
+    "java.project.outputPath": "bin",
+    "editor.tabSize": 2,
+}
