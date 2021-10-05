@@ -136,7 +136,7 @@ public class RUStoreServer {
 								fileBytes = new byte[fileLength];
 								in.readFully(fileBytes, 0, fileLength);
 
-								memStore.put(key, fileName.getBytes());
+								memStore.put(key, fileBytes);
 								System.out.println(memStore);
 							} catch(Exception e){
 
@@ -146,25 +146,7 @@ public class RUStoreServer {
 								continue;
 							}
 
-              //write bytes to file (first create directory is not there)
-							directory = new File("./serverfiles"); 
-							
-							if (directory.exists()) { 
-								System.out.println("Directory already exists..."); 
-							} else { 
-								System.out.println("Directory does not exist, creating now");
-								if (directory.mkdir()) { 
-									System.out.printf("Created new directory : serverfiles"); 
-								} else { 
-									System.out.printf("Could not create new directory: serverfiles"); 
-									break;
-								} 
-							}
-
-							//next create and write to file
-							fout = new FileOutputStream("./serverfiles/" + key);
-							fout.write(fileBytes);
-							fout.close();
+							//let the server know we are successful
 							out.writeUTF("Success");
 							out.flush();
 						}
@@ -181,8 +163,7 @@ public class RUStoreServer {
               try{
 
                 out.writeUTF("Success");
-								filePath = Paths.get("./serverfiles/"+key);
-								fileBytes = Files.readAllBytes(filePath);
+								fileBytes = memStore.get(key);
                 out.writeInt(fileBytes.length);
                 out.write(fileBytes);
                 out.flush();

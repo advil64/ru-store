@@ -51,24 +51,17 @@ Once the checks are complete, we simply do the opposite of what we did in the `P
 
 **Put File Operation**
 
-The `PUT_FILE` command is pretty much the same as the `PUT` command, however we now have the added step of writing the file to the server side. We first start off with creating the folder (if needed) then writing the file in the server files folder.
+The `PUT_FILE` command is pretty much the same as the `PUT` command, however we store a byte array of the file instead of any given byte array.
 
 ```java
-directory = new File("./serverfiles"); 
-							
-if (directory.exists()) { 
-  //don't do anything
-} else { 
-  //create the server files directory
-}
+fileBytes = new byte[fileLength];
+in.readFully(fileBytes, 0, fileLength);
 
-//next create and write to file
-fout = new FileOutputStream(filepath);
-fout.write(fileBytes);
-out.writeUTF("Success");
+memStore.put(key, fileBytes);
 ```
 
 Once the file has been stored we let the client know our action suceeded.
 
 **Get File Operation**
 
+The `GET_FILE`
